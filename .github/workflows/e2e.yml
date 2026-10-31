@@ -1,0 +1,67 @@
+name: Web E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-tests:
+    name: Testes E2E (Cypress)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurando Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalando dependências
+        run: npm ci
+
+      - name: Executando os testes
+        run: npx cypress run --spec "cypress/e2e/automation-exercise.cy.js"
+
+      - name: Publicando relatório como artefato
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: relatorio-mochawesome
+          path: |
+            cypress/reports
+            cypress/screenshots
+          retention-days: 30
+
+      - name: Preparando relatório para o GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+        with:
+          path: cypress/reports
+
+  publicar-relatorio:
+    name: Publicar relatório no GitHub Pages
+    needs: e2e-tests
+    if: ${{ !cancelled() && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Deploy do relatório
+        id: deploy
+        uses: actions/deploy-pages@v4

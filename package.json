@@ -1,0 +1,24 @@
+{
+  "name": "trabalho-automacao-web",
+  "version": "1.0.0",
+  "description": "Trabalho de conclusão da disciplina de Automação de Testes na Camada de Interface (Web) - PGATS. Casos de teste do Automation Exercise com Cypress.",
+  "private": true,
+  "scripts": {
+    "cy:open": "cypress open",
+    "test": "cypress run",
+    "test:chrome": "cypress run --browser chrome"
+  },
+  "keywords": [
+    "cypress",
+    "e2e",
+    "automation-exercise",
+    "pgats"
+  ],
+  "author": "João Roberto Parentes Mendes Filho",
+  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
+    "cypress": "^16.2.1",
+    "cypress-mochawesome-reporter": "^5.0.0"
+  }
+}
